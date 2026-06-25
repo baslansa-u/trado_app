@@ -1,0 +1,10 @@
+import 'package:flutter/material.dart';
+
+class TradingPage extends StatelessWidget {
+  const TradingPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold();
+  }
+}
