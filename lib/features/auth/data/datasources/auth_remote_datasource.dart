@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:trado_app/core/errors/exceptions.dart';
+import 'package:trado_app/features/auth/data/models/auth_response_model.dart';
 import 'package:trado_app/features/auth/data/models/user_model.dart';
 
 class AuthRemoteDatasource {
@@ -9,13 +10,13 @@ class AuthRemoteDatasource {
   AuthRemoteDatasource(this.dio);
 
   // signIn
-  Future<UserModel> signIn(String email, String password) async {
+  Future<AuthResponseModel> signIn(String email, String password) async {
     try {
       final response = await dio.post(
         '$baseUrl/auth/signin',
         data: {'email': email, 'password': password},
       );
-      return UserModel.fromJson(response.data);
+      return AuthResponseModel.fromJson(response.data);
     } on DioException catch (e) {
       throw ServerException(e.message ?? 'Unknown error');
     }

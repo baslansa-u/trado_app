@@ -1,1 +1,7 @@
-// TODO: implement local datasource for auth
+abstract interface class AuthLocalDatasource {
+  Future<String?> getToken();
+
+  Future<void> saveToken(String token);
+
+  Future<void> deleteToken();
+}
