@@ -1,15 +1,59 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../domain/repositories/auth_repository.dart';
+import 'package:trado_app/features/auth/domain/entities/user.dart';
+import 'package:trado_app/features/auth/domain/usecases/get_current_user.dart';
+import 'package:trado_app/features/auth/domain/usecases/sign_in_usecase.dart';
+import 'package:trado_app/features/auth/domain/usecases/sign_out_usecase.dart';
 
 part 'auth_state.dart';
 part 'auth_event.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  AuthBloc(
-    this._authRepository,
-  ) : super(AuthState()) {
-    // TODO: add event handlers
+  final SignInUsecase signInUsecase;
+  final SignOutUsecase signOutUsecase;
+  final GetCurrentUser getCurrentUser;
+
+  AuthBloc(this.signInUsecase, this.signOutUsecase, this.getCurrentUser)
+      : super(AuthInitial()) {
+    on<AuthCheckRequested>(_onAuthCheckRequested);
+    on<SignedOut>(_onSignedOut);
+    on<SignInRequested>(_onSignInRequested);
   }
 
-  final AuthRepository _authRepository;
+  Future<void> _onAuthCheckRequested(
+      AuthCheckRequested event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+    final result = await getCurrentUser();
+    result.fold(
+      (failure) => emit(AuthFailure(failure.message)),
+      (user) {
+        if (user != null) {
+          emit(Authenticated(user: user));
+        } else {
+          emit(AuthUnauthenticated());
+        }
+      },
+    );
+  }
+
+  Future<void> _onSignedOut(SignedOut event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+    final result = await signOutUsecase();
+    result.fold(
+      (failure) => emit(AuthFailure(failure.message)),
+      (_) => emit(AuthUnauthenticated()),
+    );
+  }
+
+  Future<void> _onSignInRequested(
+      SignInRequested event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+    final result = await signInUsecase(
+      SignInParams(email: event.email, password: event.password),
+    );
+    result.fold(
+      (failure) => emit(AuthFailure(failure.message)),
+      (user) => emit(Authenticated(user: user)),
+    );
+  }
 }
