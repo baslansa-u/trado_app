@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:trado_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:trado_app/features/auth/presentation/pages/auth_page.dart';
+import 'package:trado_app/features/auth/presentation/pages/sign_in_page.dart';
 import 'package:trado_app/features/dashboard/presentation/pages/dashboard_page.dart';
 import 'package:trado_app/injection_container.dart';
 
@@ -45,7 +46,7 @@ class AppRouter {
     routes: [
       GoRoute(
         path: auth,
-        builder: (context, state) => const AuthPage(),
+        builder: (context, state) => const SignInPage(),
       ),
       GoRoute(
         path: dashboard,

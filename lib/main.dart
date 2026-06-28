@@ -20,7 +20,7 @@ class TradoApp extends StatelessWidget {
     return BlocProvider(
       create: (context) => sl<AuthBloc>()..add(AuthCheckRequested()),
       child: MaterialApp.router(
-        title: 'Trado App',
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
