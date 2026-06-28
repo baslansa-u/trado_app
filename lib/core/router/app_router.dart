@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:trado_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:trado_app/features/auth/presentation/pages/auth_page.dart';
 import 'package:trado_app/features/dashboard/presentation/pages/dashboard_page.dart';
-import 'package:trado_app/main.dart';
+import 'package:trado_app/injection_container.dart';
 
 class BlocRefreshListenable extends ChangeNotifier {
   late final StreamSubscription _sub;

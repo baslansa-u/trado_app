@@ -4,6 +4,7 @@ import 'package:trado_app/features/auth/domain/entities/user.dart';
 import 'package:trado_app/features/auth/domain/usecases/get_current_user.dart';
 import 'package:trado_app/features/auth/domain/usecases/sign_in_usecase.dart';
 import 'package:trado_app/features/auth/domain/usecases/sign_out_usecase.dart';
+import 'package:trado_app/features/auth/domain/usecases/sign_up_usecase.dart';
 
 part 'auth_state.dart';
 part 'auth_event.dart';
@@ -12,12 +13,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final SignInUsecase signInUsecase;
   final SignOutUsecase signOutUsecase;
   final GetCurrentUser getCurrentUser;
+  final SignUpUsecase signUpUsecase;
 
-  AuthBloc(this.signInUsecase, this.signOutUsecase, this.getCurrentUser)
-      : super(AuthInitial()) {
+  AuthBloc(
+    this.signInUsecase,
+    this.signOutUsecase,
+    this.getCurrentUser,
+    this.signUpUsecase,
+  ) : super(AuthInitial()) {
     on<AuthCheckRequested>(_onAuthCheckRequested);
     on<SignedOut>(_onSignedOut);
     on<SignInRequested>(_onSignInRequested);
+    on<SignUpRequested>(_onSignUpRequested);
   }
 
   Future<void> _onAuthCheckRequested(
@@ -27,11 +34,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     result.fold(
       (failure) => emit(AuthFailure(failure.message)),
       (user) {
-        if (user != null) {
-          emit(Authenticated(user: user));
-        } else {
-          emit(AuthUnauthenticated());
-        }
+        emit(
+          Authenticated(user: user),
+        );
       },
     );
   }
@@ -41,7 +46,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     final result = await signOutUsecase();
     result.fold(
       (failure) => emit(AuthFailure(failure.message)),
-      (_) => emit(AuthUnauthenticated()),
+      (_) => emit(Unauthenticated()),
     );
   }
 
@@ -54,6 +59,21 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     result.fold(
       (failure) => emit(AuthFailure(failure.message)),
       (user) => emit(Authenticated(user: user)),
+    );
+  }
+
+  Future<void> _onSignUpRequested(
+      SignUpRequested event, Emitter<AuthState> emit) async {
+    emit(AuthLoading());
+    final result = await signUpUsecase(
+      SignUpParams(
+          email: event.email,
+          password: event.password,
+          username: event.username),
+    );
+    result.fold(
+      (failure) => emit(AuthFailure(failure.message)),
+      (user) => emit(Unauthenticated()),
     );
   }
 }
